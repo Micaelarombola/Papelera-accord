@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Papelera Accord | Control de Stock</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">PA</div>
+      <div><h1>Papelera</h1><strong>Accord</strong></div>
+    </div>
+
+    <nav class="nav-menu" aria-label="Navegación principal">
+      <button class="nav-item active" data-section="dashboard">🏠 <span>Inicio</span></button>
+      <button class="nav-item" data-section="products">📦 <span>Productos</span></button>
+      <button class="nav-item" data-section="sale">🛒 <span>Registrar venta</span></button>
+      <button class="nav-item" data-section="customers">👥 <span>Clientes</span></button>
+      <button class="nav-item" data-section="sales-history">🧾 <span>Historial de ventas</span></button>
+      <button class="nav-item" data-section="entry">🚚 <span>Ingresar mercadería</span></button>
+      <button class="nav-item" data-section="movements">📋 <span>Movimientos</span></button>
+      <button class="nav-item" data-section="low-stock">⚠️ <span>Stock bajo</span></button>
+      <button class="nav-item" data-section="categories">🏷️ <span>Categorías</span></button>
+      <button class="nav-item" data-section="reports">📊 <span>Reportes</span></button>
+      <button class="nav-item" data-section="backup">💾 <span>Respaldos</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>Todo para tus ideas</p>
+      <small>Inventario · Clientes · Ventas</small>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="search-wrap">
+        <span>🔎</span>
+        <input id="globalSearch" type="search"
+          placeholder="Buscar producto, código o categoría..."
+          autocomplete="off">
+      </div>
+      <div class="topbar-user">
+        <div class="avatar">PA</div>
+        <div><strong>Papelera Accord</strong><small>Administración</small></div>
+      </div>
+    </header>
+
+    <!-- INICIO -->
+    <section id="dashboard" class="page-section active">
+      <div class="page-heading split-heading">
+        <div>
+          <span class="eyebrow">Panel principal</span>
+          <h2>¡Hola!</h2>
+          <p>Controlá tu stock de forma simple y organizada.</p>
+          <div id="firstSteps" class="first-steps hidden" role="note">
+            <strong>¡Tu sistema está listo para empezar!</strong>
+            <span>Comenzá en Productos para cargar el inventario. Después podés agregar clientes y registrar ventas.</span>
+            <button type="button" class="btn primary" data-go="products">
+              Cargar primer producto →
+            </button>
+          </div>
+        </div>
+        <div class="brand-phrase">Más que papelería,<br><strong>soluciones.</strong></div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card blue">
+          <div class="stat-icon">📦</div>
+          <div><strong id="statProducts">0</strong><span>Productos registrados</span></div>
+        </article>
+        <article class="stat-card green">
+          <div class="stat-icon">⚠️</div>
+          <div><strong id="statLow">0</strong><span>Productos con stock bajo</span></div>
+        </article>
+        <article class="stat-card blue">
+          <div class="stat-icon">🛒</div>
+          <div><strong id="statSalesToday">0</strong><span>Ventas registradas hoy</span></div>
+        </article>
+        <article class="stat-card green">
+          <div class="stat-icon">🔁</div>
+          <div><strong id="statMovementsToday">0</strong><span>Movimientos de hoy</span></div>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="panel">
+          <div class="panel-title"><h3>Stock por categoría</h3></div>
+          <div class="category-summary">
+            <div class="donut" id="categoryDonut">
+              <div class="donut-center">
+                <strong id="donutTotal">0</strong><span>unidades</span>
+              </div>
+            </div>
+            <div id="categoryLegend" class="legend"></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">
+            <h3>Productos para reponer</h3>
+            <button class="link-button" data-go="low-stock">Ver todos</button>
+          </div>
+          <div class="table-wrap compact-table-wrap">
+            <table>
+              <thead><tr>
+                <th>Producto</th><th>Stock</th><th>Mínimo</th><th>Estado</th>
+              </tr></thead>
+              <tbody id="dashboardLowStock"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <div class="dashboard-bottom">
+        <article class="panel">
+          <div class="panel-title">
+            <h3>Últimos movimientos</h3>
+            <button class="link-button" data-go="movements">Ver todos</button>
+          </div>
+          <div class="table-wrap compact-table-wrap">
+            <table>
+              <thead><tr>
+                <th>Fecha</th><th>Tipo</th><th>Producto</th>
+                <th>Cantidad</th><th>Stock resultante</th>
+              </tr></thead>
+              <tbody id="dashboardMovements"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel quick-panel">
+          <div class="panel-title"><h3>Accesos rápidos</h3></div>
+          <button class="quick-action primary" data-go="sale">
+            🛒 Registrar venta <span>›</span>
+          </button>
+          <button class="quick-action success" data-go="entry">
+            🚚 Ingresar mercadería <span>›</span>
+          </button>
+          <button class="quick-action light" data-go="products">
+            📦 Nuevo producto <span>›</span>
+          </button>
+          <button class="quick-action pale" data-go="reports">
+            📊 Ver reportes <span>›</span>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS -->
+    <section id="products" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Inventario</span>
+        <h2>Productos</h2>
+        <p>Agregá, editá y controlá todos los artículos.</p>
+      </div>
+
+      <div class="heading-actions margin-bottom">
+        <button id="downloadProductsCsv" class="btn secondary" type="button">
+          ↓ Exportar productos CSV
+        </button>
+      </div>
+
+      <div class="content-grid two-columns">
+        <article class="panel form-panel">
+          <div class="panel-title"><h3 id="productFormTitle">Nuevo producto</h3></div>
+          <form id="productForm" class="form-grid">
+            <input type="hidden" id="productId">
+
+            <label>Código / SKU
+              <input id="productCode" type="text" placeholder="Ej: VASO-590-AZ" required>
+            </label>
+            <label>Nombre del producto
+              <input id="productName" type="text" placeholder="Ej: Vaso americano 590cc" required>
+            </label>
+            <label>Categoría
+              <input id="productCategory" type="text" list="categoryOptions"
+                placeholder="Ej: Cotillón" required>
+              <datalist id="categoryOptions"></datalist>
+            </label>
+            <label>Stock actual
+              <input id="productStock" type="number" min="0" step="1" value="0" required>
+            </label>
+            <label>Stock mínimo
+              <input id="productMinStock" type="number" min="0" step="1" value="10" required>
+            </label>
+            <label>Precio de venta (opcional)
+              <input id="productPrice" type="number" min="0" step="0.01" placeholder="0">
+            </label>
+
+            <div class="form-actions full-width">
+              <button class="btn primary" type="submit" id="productSubmitBtn">
+                Guardar producto
+              </button>
+              <button class="btn secondary hidden" type="button" id="cancelEditBtn">
+                Cancelar edición
+              </button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title responsive-title">
+            <div>
+              <h3>Listado de productos</h3>
+              <small id="productCountText">0 productos</small>
+            </div>
+            <div class="filters-inline">
+              <select id="productCategoryFilter">
+                <option value="">Todas las categorías</option>
+              </select>
+              <select id="productStatusFilter">
+                <option value="">Todos los estados</option>
+                <option value="ok">Disponible</option>
+                <option value="low">Stock bajo</option>
+                <option value="out">Sin stock</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap products-table-wrap">
+            <table>
+              <thead><tr>
+                <th>Código</th><th>Producto</th><th>Categoría</th>
+                <th>Stock</th><th>Mínimo</th><th>Estado</th><th>Acciones</th>
+              </tr></thead>
+              <tbody id="productsTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- REGISTRAR VENTA -->
+    <section id="sale" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Nueva operación</span>
+        <h2>Registrar venta</h2>
+        <p>Agregá el cliente y todos los productos que quiera comprar.
+          El stock se descontará cuando confirmes la venta.</p>
+      </div>
+
+      <div class="sale-layout">
+        <div class="sale-left">
+          <article class="panel sale-card">
+            <div class="panel-title"><h3>👤 Cliente</h3></div>
+            <div class="sale-client-select-wrap">
+              <label>Elegir cliente registrado (opcional)
+                <select id="saleClientSelect">
+                  <option value="">Consumidor final / ingresar nuevo</option>
+                </select>
+              </label>
+            </div>
+            <div class="sale-client-grid">
+              <label>Nombre del cliente
+                <input type="text" id="saleClientName"
+                  placeholder="Ej: María González" autocomplete="off">
+              </label>
+              <label>Teléfono
+                <input type="text" id="saleClientPhone"
+                  placeholder="Ej: 11 5555-5555">
+              </label>
+            </div>
+            <div class="sale-client-bottom">
+              <small class="helper-text">Podés dejarlo vacío si es una venta sin cliente registrado.</small>
+              <button type="button" id="saveSaleCustomer" class="btn secondary">
+                + Guardar cliente
+              </button>
+            </div>
+          </article>
+
+          <article class="panel sale-card">
+            <div class="panel-title"><h3>🔎 Buscar producto</h3></div>
+            <div class="product-sale-search">
+              <div class="sale-search-box">
+                <span>🔎</span>
+                <input type="search" id="saleProductSearch"
+                  placeholder="Buscar por nombre, código o categoría..."
+                  autocomplete="off">
+              </div>
+              <div id="saleSearchResults" class="sale-search-results hidden"></div>
+            </div>
+
+            <div id="selectedSaleProduct" class="selected-sale-product hidden">
+              <div>
+                <small>Producto seleccionado</small>
+                <strong id="selectedSaleProductName">Producto</strong>
+                <span id="selectedSaleProductInfo">Stock disponible</span>
+              </div>
+              <div class="selected-product-price">
+                <small>Precio unitario</small>
+                <strong id="selectedSaleProductPrice">$0</strong>
+              </div>
+            </div>
+
+            <div class="sale-add-row">
+              <label>Cantidad
+                <input type="number" id="saleProductQuantity"
+                  value="1" min="1" step="1">
+              </label>
+              <button type="button" id="addProductToSale"
+                class="btn primary large" disabled>
+                + Agregar a la venta
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <article class="panel sale-cart">
+          <div class="panel-title">
+            <div>
+              <h3>🛒 Venta actual</h3>
+              <small id="saleItemsCount">0 productos</small>
+            </div>
+            <button type="button" id="clearSaleCart" class="link-danger">
+              Vaciar
+            </button>
+          </div>
+
+          <div class="sale-cart-content">
+            <div id="emptySaleCart" class="empty-cart">
+              <div>🛒</div>
+              <strong>Todavía no agregaste productos</strong>
+              <span>Buscá un artículo y agregalo a la venta.</span>
+            </div>
+            <div id="saleCartTableWrapper" class="table-wrap hidden">
+              <table class="sale-cart-table">
+                <thead><tr>
+                  <th>Producto</th><th>Cant.</th><th>Precio</th>
+                  <th>Subtotal</th><th></th>
+                </tr></thead>
+                <tbody id="saleCartTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sale-total-box">
+            <div>
+              <span>Subtotal</span>
+              <strong id="saleSubtotal">$0</strong>
+            </div>
+            <div class="sale-grand-total">
+              <span>TOTAL</span>
+              <strong id="saleTotal">$0</strong>
+            </div>
+          </div>
+          <p class="sale-confirm-hint">
+            Al finalizar, se descuenta el stock y se guarda el ticket en el historial.
+          </p>
+          <button id="finishSaleButton" type="button"
+            class="btn success finish-sale-btn" disabled>
+            ✓ Finalizar venta
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- INGRESAR MERCADERÍA -->
+    <section id="entry" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Entrada de stock</span>
+        <h2>Ingresar mercadería</h2>
+        <p>Registrá reposiciones o nuevos ingresos de mercadería.</p>
+      </div>
+      <article class="panel transaction-panel">
+        <form id="entryForm" class="transaction-form">
+          <label>Producto
+            <select id="entryProduct" required></select>
+          </label>
+          <div class="stock-preview" id="entryStockPreview">
+            <span>Stock actual</span><strong>0 unidades</strong>
+          </div>
+          <label>Cantidad recibida
+            <input id="entryQuantity" type="number"
+              min="1" step="1" value="1" required>
+          </label>
+          <label class="full-width">Detalle del ingreso (opcional)
+            <input id="entryDetail" maxlength="160"
+              placeholder="Ej: compra a proveedor">
+          </label>
+          <button class="btn success large" type="submit">
+            Ingresar mercadería
+          </button>
+        </form>
+      </article>
+    </section>
+
+    <!-- MOVIMIENTOS -->
+    <section id="movements" class="page-section">
+      <div class="page-heading split-heading">
+        <div>
+          <span class="eyebrow">Historial</span>
+          <h2>Movimientos</h2>
+          <p>Revisá cada entrada y salida registrada.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn secondary" id="downloadMovementsCsv">
+            Descargar CSV
+          </button>
+        </div>
+      </div>
+      <article class="panel">
+        <div class="panel-title responsive-title">
+          <h3>Historial completo</h3>
+          <div class="filters-inline">
+            <select id="movementTypeFilter">
+              <option value="">Todos los movimientos</option>
+              <option value="sale">Ventas</option>
+              <option value="entry">Entradas</option>
+              <option value="adjustment">Ajustes</option>
+              <option value="return">Devoluciones</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Fecha</th><th>Tipo</th><th>Producto</th>
+              <th>Cantidad</th><th>Stock resultante</th><th>Detalle</th>
+            </tr></thead>
+            <tbody id="movementsTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- STOCK BAJO -->
+    <section id="low-stock" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Reposición</span>
+        <h2>Stock bajo</h2>
+        <p>Productos que llegaron o están por debajo del mínimo configurado.</p>
+      </div>
+      <article class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Producto</th><th>Categoría</th><th>Stock actual</th>
+              <th>Stock mínimo</th><th>Faltan para mínimo</th><th>Estado</th>
+            </tr></thead>
+            <tbody id="lowStockTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- CATEGORÍAS -->
+    <section id="categories" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Organización</span>
+        <h2>Categorías</h2>
+        <p>Vista general del inventario agrupado por categoría.</p>
+      </div>
+      <div id="categoriesCards" class="category-cards"></div>
+    </section>
+
+    <!-- REPORTES -->
+    <section id="reports" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Resumen</span>
+        <h2>Reportes</h2>
+        <p>Información rápida para entender el movimiento del stock.</p>
+      </div>
+      <div class="report-grid">
+        <article class="panel report-card">
+          <span>Unidades totales en stock</span>
+          <strong id="reportUnits">0</strong>
+        </article>
+        <article class="panel report-card">
+          <span>Unidades vendidas</span>
+          <strong id="reportSoldUnits">0</strong>
+        </article>
+        <article class="panel report-card">
+          <span>Unidades ingresadas</span>
+          <strong id="reportEntryUnits">0</strong>
+        </article>
+        <article class="panel report-card">
+          <span>Valor del stock a precio de venta</span>
+          <strong id="reportStockValue">$0</strong>
+        </article>
+        <article class="panel report-card">
+          <span>Ventas confirmadas</span>
+          <strong id="reportSalesCount">0</strong>
+        </article>
+        <article class="panel report-card">
+          <span>Facturación registrada (no fiscal)</span>
+          <strong id="reportRevenue">$0</strong>
+        </article>
+      </div>
+      <article class="panel top-products-panel">
+        <div class="panel-title"><h3>Productos más vendidos</h3></div>
+        <div id="topProductsList" class="top-products-list"></div>
+      </article>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="customers" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Agenda</span>
+        <h2>Clientes</h2>
+        <p>Guardá clientes para seleccionarlos rápidamente cuando vendas.</p>
+      </div>
+      <div class="content-grid two-columns">
+        <article class="panel form-panel">
+          <div class="panel-title">
+            <h3 id="customerFormTitle">Nuevo cliente</h3>
+          </div>
+          <form id="customerForm" class="form-grid">
+            <input type="hidden" id="customerId">
+            <label>Nombre y apellido / razón social
+              <input id="customerName" required maxlength="120"
+                autocomplete="name" placeholder="Nombre del cliente">
+            </label>
+            <label>Teléfono (opcional)
+              <input id="customerPhone" type="tel" maxlength="40"
+                placeholder="Ej: 11 5555-5555">
+            </label>
+            <label>Correo electrónico (opcional)
+              <input id="customerEmail" type="email" maxlength="160"
+                placeholder="cliente@correo.com">
+            </label>
+            <label>Observaciones (opcional)
+              <textarea id="customerNotes" rows="3" maxlength="400"
+                placeholder="Información útil para futuras ventas"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="btn primary" type="submit" id="customerSubmitBtn">
+                Guardar cliente
+              </button>
+              <button class="btn secondary hidden" type="button"
+                id="cancelCustomerEdit">Cancelar edición</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title responsive-title">
+            <div>
+              <h3>Listado de clientes</h3>
+              <small id="customerCountText">0 clientes</small>
+            </div>
+            <input id="customerSearch" type="search"
+              placeholder="Buscar cliente o teléfono..."
+              aria-label="Buscar clientes">
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Cliente</th><th>Teléfono</th><th>Email</th>
+                <th>Ventas</th><th>Acciones</th>
+              </tr></thead>
+              <tbody id="customersTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- HISTORIAL DE VENTAS -->
+    <section id="sales-history" class="page-section">
+      <div class="page-heading split-heading">
+        <div>
+          <span class="eyebrow">Comprobantes</span>
+          <h2>Historial de ventas</h2>
+          <p>Consultá ventas, reimprimí tickets y anulá operaciones cuando sea necesario.</p>
+        </div>
+        <button id="downloadSalesCsv" class="btn secondary" type="button">
+          ↓ Exportar ventas CSV
+        </button>
+      </div>
+      <article class="panel">
+        <div class="panel-title responsive-title">
+          <h3>Ventas registradas</h3>
+          <div class="filters-inline">
+            <input id="salesSearch" type="search"
+              placeholder="Número, cliente o producto..."
+              aria-label="Buscar ventas">
+            <select id="salesStatusFilter" aria-label="Filtrar ventas">
+              <option value="">Todas las ventas</option>
+              <option value="active">Confirmadas</option>
+              <option value="cancelled">Anuladas</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Número</th><th>Fecha</th><th>Cliente</th>
+              <th>Artículos</th><th>Total</th><th>Estado</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="salesHistoryTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- RESPALDOS -->
+    <section id="backup" class="page-section">
+      <div class="page-heading">
+        <span class="eyebrow">Seguridad de datos</span>
+        <h2>Respaldos</h2>
+        <p>Protegé los datos del negocio y recuperalos cuando cambies de computadora o navegador.</p>
+      </div>
+
+      <div class="backup-grid">
+        <article class="panel backup-card">
+          <div class="backup-icon">📥</div>
+          <h3>Descargar copia de seguridad</h3>
+          <p>Guarda productos, clientes, ventas y movimientos en un archivo JSON.
+            Hacé una copia periódicamente y guardala en un lugar seguro.</p>
+          <button id="exportBackup" class="btn primary" type="button">
+            Descargar respaldo JSON
+          </button>
+        </article>
+
+        <article class="panel backup-card">
+          <div class="backup-icon">📤</div>
+          <h3>Restaurar copia de seguridad</h3>
+          <p>Importá un archivo generado por este sistema. La restauración
+            reemplaza todos los datos actuales: descargá antes un respaldo.</p>
+          <label class="file-label">Seleccionar archivo JSON
+            <input id="importBackupFile" type="file"
+              accept=".json,application/json">
+          </label>
+          <button id="importBackup" class="btn secondary" type="button">
+            Restaurar respaldo
+          </button>
+        </article>
+
+        <article class="panel backup-card danger-zone">
+          <div class="backup-icon">⚠️</div>
+          <h3>Borrar todos los datos</h3>
+          <p>Elimina permanentemente el inventario, los clientes, las ventas
+            y el historial de este navegador. No se puede deshacer sin un respaldo.</p>
+          <button id="resetAllData" class="btn danger" type="button">
+            Borrar todos los datos
+          </button>
+        </article>
+      </div>
+
+      <div class="data-notice">
+        <strong>Importante:</strong> Los datos se guardan únicamente en este
+        navegador y dispositivo. No se sincronizan entre equipos ni constituyen
+        una base de datos en la nube. No uses el modo incógnito ni borres los
+        datos del sitio. Este sistema emite comprobantes internos, no facturas fiscales.
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <strong>PAPELERA ACCORD</strong>
+      <span>•</span>
+      <span>Sistema de gestión · Comprobantes internos</span>
+    </footer>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="confirmModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-card" role="dialog" aria-modal="true"
+    aria-labelledby="confirmTitle">
+    <h3 id="confirmTitle">Confirmar acción</h3>
+    <p id="confirmMessage">¿Seguro que querés continuar?</p>
+    <div class="modal-actions">
+      <button class="btn secondary" data-close-modal>Cancelar</button>
+      <button class="btn danger" id="confirmActionBtn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

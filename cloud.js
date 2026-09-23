@@ -4,7 +4,7 @@
 // PAPELERA ACCORD
 // Conexión con Supabase e inicio de sesión.
 
-const cloud = (() => {
+window.cloud = (() => {
   let client;
   let revision = null;
   let signedIn = false;

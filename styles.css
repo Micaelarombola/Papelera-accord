@@ -1111,3 +1111,104 @@ input::placeholder{color:#9aabb9}
   .sale-client-bottom .helper-text{padding:0}
   .sale-client-bottom .btn{margin:0}
 }
+
+/* ==========================================
+   ACCESO PRIVADO Y SINCRONIZACIÓN
+========================================== */
+
+/* Oculta el sistema hasta que el usuario inicie sesión */
+body.locked .app-shell,
+body.locked .modal,
+body.locked .toast {
+  display: none !important;
+}
+
+/* Oculta el login después de ingresar */
+body:not(.locked) .login-screen {
+  display: none;
+}
+
+/* Pantalla de acceso */
+.login-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #e9f5ff, #edf8ec);
+}
+
+/* Tarjeta del formulario */
+.login-box {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 15px;
+  padding: 34px;
+  border: 1px solid #dbe7f1;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 14px 48px #0a356225;
+}
+
+.login-box .brand-mark {
+  margin: auto;
+}
+
+.login-box h1 {
+  margin: 0;
+  color: #0a3562;
+  text-align: center;
+}
+
+.login-box p {
+  margin: 0;
+  color: #5a7085;
+  text-align: center;
+}
+
+.login-box small {
+  color: #6c7f91;
+  text-align: center;
+}
+
+.login-box .login-error {
+  min-height: 20px;
+  color: #b53535;
+  font-size: 13px;
+}
+
+.login-box button {
+  width: 100%;
+}
+
+.login-box button:disabled {
+  opacity: 0.6;
+}
+
+/* Bloquea interacciones mientras se guardan datos */
+body.cloud-busy .app-shell {
+  pointer-events: none;
+  opacity: 0.76;
+}
+
+/* Botones de sesión en celulares */
+@media (max-width: 650px) {
+  #refreshCloud,
+  #logoutButton {
+    min-height: 35px;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .topbar-user {
+    display: flex !important;
+    gap: 5px;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    width: 100%;
+  }
+}

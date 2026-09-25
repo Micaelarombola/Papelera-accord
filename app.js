@@ -3541,78 +3541,56 @@ function saleCompleted(
 // IMPRIMIR TICKET
 // =====================================================
 
-function printTicket(
-  sale
-) {
+function printTicket(sale) {
 
-  const printWindow =
-    window.open(
-      "",
-      "_blank",
-      "width=510,height=760"
-    );
+  const printWindow = window.open(
+    "",
+    "_blank",
+    "width=520,height=820"
+  );
 
-
-  if (
-    !printWindow
-  ) {
-
+  if (!printWindow) {
     toast(
       "El navegador bloqueó el ticket. Permití ventanas emergentes para imprimir.",
       true
     );
-
     return;
-
   }
 
 
-  const rows =
-    sale.items
-      .map(
-        item => `
-
-          <tr>
-
-            <td>
-
-              ${esc(item.name)}
-
-              <small>
-                ${esc(item.code)}
-              </small>
-
-            </td>
+  const totalUnits = sale.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
 
-            <td>
-              ${item.quantity}
-            </td>
+  const rows = sale.items.map(item => `
+    <tr>
 
+      <td class="product-cell">
+        <strong>${esc(item.name)}</strong>
+        <small>Cód. ${esc(item.code)}</small>
+      </td>
 
-            <td>
-              ${money(item.price)}
-            </td>
+      <td class="center">
+        ${item.quantity}
+      </td>
 
+      <td class="right">
+        ${money(item.price)}
+      </td>
 
-            <td>
-              ${
-                money(
-                  item.price *
-                  item.quantity
-                )
-              }
-            </td>
+      <td class="right">
+        <strong>
+          ${money(item.price * item.quantity)}
+        </strong>
+      </td>
 
-          </tr>
-
-        `
-      )
-      .join("");
+    </tr>
+  `).join("");
 
 
   printWindow.document.open();
-
 
   printWindow.document.write(`
 
@@ -3630,296 +3608,306 @@ function printTicket(
       >
 
       <title>
-        ${esc(sale.number)}
+        Papelera Accord · ${esc(sale.number)}
       </title>
 
 
       <style>
 
         * {
-          box-sizing:
-            border-box;
+          box-sizing: border-box;
         }
-
 
         body {
+          margin: 0;
+          padding: 22px;
+          background: #ffffff;
+          color: #17212b;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 12px;
+        }
 
-          max-width:
-            450px;
+        .ticket {
+          width: 100%;
+          max-width: 460px;
+          margin: 0 auto;
+        }
 
-          margin:
-            20px auto;
+        /* =========================
+           ENCABEZADO
+        ========================= */
 
-          padding:
-            15px;
+        .header {
+          text-align: center;
+          padding-bottom: 18px;
+          border-bottom: 2px solid #0d477f;
+        }
 
-          color:
-            #111;
+        .brand {
+          margin: 0;
+          font-size: 27px;
+          line-height: 1;
+          font-weight: 900;
+          letter-spacing: -0.5px;
+          color: #0d477f;
+        }
 
-          font-family:
-            Arial,
-            sans-serif;
+        .brand span {
+          color: #50ad36;
+        }
 
-          font-size:
-            13px;
+        .slogan {
+          margin-top: 7px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #555;
+        }
 
+        .categories {
+          display: inline-block;
+          margin-top: 10px;
+          padding: 6px 10px;
+          border-radius: 20px;
+          background: #f2f7fb;
+          color: #0d477f;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: .2px;
         }
 
 
-        .ticket-header {
+        /* =========================
+           DATOS DE LA VENTA
+        ========================= */
 
-          padding-bottom:
-            16px;
+        .sale-box {
+          margin-top: 17px;
+          padding: 13px 14px;
+          border: 1px solid #dbe5ed;
+          border-radius: 10px;
+          background: #f9fbfd;
+        }
 
-          border-bottom:
-            1px dashed #888;
+        .sale-number {
+          margin-bottom: 9px;
+          color: #0d477f;
+          font-size: 15px;
+          font-weight: 900;
+        }
 
-          text-align:
-            center;
+        .sale-line {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+          margin: 4px 0;
+        }
 
+        .sale-line span:first-child {
+          color: #6b7884;
+        }
+
+        .sale-line strong {
+          text-align: right;
         }
 
 
-        .logo {
+        /* =========================
+           RESUMEN
+        ========================= */
 
-          margin:
-            0;
+        .summary {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin: 14px 0;
+        }
 
-          color:
-            #0d477f;
-
-          font-size:
-            24px;
-
-          font-weight:
-            900;
-
+        .summary span {
+          padding: 5px 9px;
+          border: 1px solid #dce5ec;
+          border-radius: 6px;
+          font-size: 10px;
+          font-weight: 700;
         }
 
 
-        .logo span {
-
-          color:
-            #4b9f34;
-
-        }
-
-
-        .subtitle {
-
-          margin-top:
-            5px;
-
-          color:
-            #555;
-
-          font-size:
-            12px;
-
-        }
-
-
-        .sale-data {
-
-          margin:
-            18px 0;
-
-          line-height:
-            1.7;
-
-        }
-
+        /* =========================
+           TABLA
+        ========================= */
 
         table {
-
-          width:
-            100%;
-
-          margin-top:
-            18px;
-
-          border-collapse:
-            collapse;
-
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+          table-layout: fixed;
         }
 
+        thead {
+          border-top: 1px solid #ccd7df;
+          border-bottom: 2px solid #0d477f;
+        }
 
-        th,
+        th {
+          padding: 9px 4px;
+          color: #0d477f;
+          font-size: 10px;
+          text-transform: uppercase;
+        }
+
         td {
-
-          padding:
-            8px 3px;
-
-          border-bottom:
-            1px solid #ddd;
-
-          vertical-align:
-            top;
-
-          text-align:
-            left;
-
-          font-size:
-            11px;
-
+          padding: 9px 4px;
+          border-bottom: 1px solid #e3e8ec;
+          vertical-align: top;
+          font-size: 10px;
         }
 
+        th:first-child,
+        td:first-child {
+          width: 46%;
+          text-align: left;
+        }
 
         th:nth-child(2),
         td:nth-child(2) {
-
-          text-align:
-            center;
-
+          width: 11%;
         }
-
 
         th:nth-child(3),
-        td:nth-child(3),
+        td:nth-child(3) {
+          width: 20%;
+        }
+
         th:nth-child(4),
         td:nth-child(4) {
+          width: 23%;
+        }
 
-          text-align:
-            right;
+        .product-cell strong {
+          display: block;
+          font-size: 10.5px;
+          line-height: 1.25;
+        }
 
+        .product-cell small {
+          display: block;
+          margin-top: 3px;
+          color: #84909b;
+          font-size: 8.5px;
+        }
+
+        .center {
+          text-align: center;
+        }
+
+        .right {
+          text-align: right;
         }
 
 
-        td small {
+        /* =========================
+           TOTAL
+        ========================= */
 
-          display:
-            block;
+        .total-box {
+          margin-top: 18px;
+          padding: 15px;
+          border-radius: 10px;
+          background: #0d477f;
+          color: white;
 
-          margin-top:
-            3px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
 
-          color:
-            #777;
+        .total-label {
+          font-size: 13px;
+          font-weight: 700;
+        }
 
-          font-size:
-            9px;
-
+        .total-amount {
+          font-size: 23px;
+          font-weight: 900;
         }
 
 
-        .ticket-total {
+        /* =========================
+           PIE
+        ========================= */
 
-          display:
-            flex;
-
-          justify-content:
-            space-between;
-
-          align-items:
-            center;
-
-          margin-top:
-            20px;
-
-          padding-top:
-            15px;
-
-          border-top:
-            2px dashed #222;
-
-          font-size:
-            20px;
-
-          font-weight:
-            bold;
-
+        .footer {
+          margin-top: 22px;
+          padding-top: 16px;
+          border-top: 1px dashed #aeb8bf;
+          text-align: center;
         }
-
 
         .thanks {
+          color: #0d477f;
+          font-size: 14px;
+          font-weight: 900;
+        }
 
-          margin-top:
-            28px;
+        .footer-services {
+          margin-top: 7px;
+          color: #4d9f36;
+          font-size: 10px;
+          font-weight: 700;
+        }
 
-          text-align:
-            center;
-
-          line-height:
-            1.6;
-
+        .internal {
+          margin-top: 14px;
+          color: #8a949d;
+          font-size: 8.5px;
         }
 
 
-        .fiscal-notice {
+        /* =========================
+           BOTONES
+        ========================= */
 
-          margin-top:
-            8px;
+        .actions {
+          margin-top: 22px;
+          text-align: center;
+        }
 
-          color:
-            #666;
-
-          font-size:
-            10px;
-
-          text-align:
-            center;
-
+        .actions button {
+          padding: 11px 20px;
+          border: 0;
+          border-radius: 8px;
+          background: #0d477f;
+          color: white;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 700;
         }
 
 
-        .no-print {
-
-          margin-top:
-            25px;
-
-          text-align:
-            center;
-
-        }
-
-
-        button {
-
-          padding:
-            11px 20px;
-
-          border:
-            0;
-
-          border-radius:
-            8px;
-
-          background:
-            #0d477f;
-
-          color:
-            white;
-
-          cursor:
-            pointer;
-
-          font-size:
-            14px;
-
-          font-weight:
-            bold;
-
-        }
-
+        /* =========================
+           IMPRESIÓN
+        ========================= */
 
         @media print {
 
-          body {
-
-            max-width:
-              none;
-
-            margin:
-              0;
-
+          @page {
+            margin: 8mm;
           }
 
+          body {
+            padding: 0;
+          }
 
-          .no-print {
+          .ticket {
+            max-width: none;
+          }
 
-            display:
-              none;
+          .actions {
+            display: none;
+          }
 
+          .sale-box,
+          .total-box {
+            break-inside: avoid;
           }
 
         }
@@ -3931,155 +3919,185 @@ function printTicket(
 
     <body>
 
+      <main class="ticket">
 
-      <div class="ticket-header">
 
-        <div class="logo">
+        <header class="header">
 
-          PAPELERA
+          <h1 class="brand">
+            PAPELERA <span>ACCORD</span>
+          </h1>
+
+          <div class="slogan">
+            Todo para tus ideas
+          </div>
+
+          <div class="categories">
+            Envoltorios · Embalaje · Limpieza y más
+          </div>
+
+        </header>
+
+
+        <section class="sale-box">
+
+          <div class="sale-number">
+            ${esc(sale.number)}
+          </div>
+
+
+          <div class="sale-line">
+
+            <span>Fecha</span>
+
+            <strong>
+              ${dateTime(sale.date)}
+            </strong>
+
+          </div>
+
+
+          <div class="sale-line">
+
+            <span>Cliente</span>
+
+            <strong>
+              ${esc(sale.customerName)}
+            </strong>
+
+          </div>
+
+
+          ${
+            sale.customerPhone
+              ? `
+                <div class="sale-line">
+
+                  <span>Teléfono</span>
+
+                  <strong>
+                    ${esc(sale.customerPhone)}
+                  </strong>
+
+                </div>
+              `
+              : ""
+          }
+
+
+          <div class="sale-line">
+
+            <span>Estado</span>
+
+            <strong>
+              ${
+                sale.status === "cancelled"
+                  ? "ANULADA"
+                  : "Confirmada"
+              }
+            </strong>
+
+          </div>
+
+        </section>
+
+
+        <div class="summary">
 
           <span>
-            ACCORD
+            ${sale.items.length}
+            ${
+              sale.items.length === 1
+                ? "producto"
+                : "productos"
+            }
+          </span>
+
+          <span>
+            ${totalUnits}
+            ${
+              totalUnits === 1
+                ? "unidad"
+                : "unidades"
+            }
           </span>
 
         </div>
 
 
-        <div class="subtitle">
-          Todo para tus ideas
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Producto</th>
+
+              <th class="center">
+                Cant.
+              </th>
+
+              <th class="right">
+                Precio
+              </th>
+
+              <th class="right">
+                Subtotal
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+            ${rows}
+          </tbody>
+
+        </table>
+
+
+        <div class="total-box">
+
+          <span class="total-label">
+            TOTAL
+          </span>
+
+          <span class="total-amount">
+            ${money(sale.total)}
+          </span>
+
         </div>
 
-      </div>
+
+        <footer class="footer">
+
+          <div class="thanks">
+            ¡Gracias por tu compra!
+          </div>
+
+          <div class="footer-services">
+            Envoltorios · Embalaje · Limpieza y más
+          </div>
+
+          <div class="internal">
+            PAPELERA ACCORD<br>
+            Comprobante interno · No válido como factura fiscal
+          </div>
+
+        </footer>
 
 
-      <div class="sale-data">
+        <div class="actions">
 
-        <strong>
-          ${esc(sale.number)}
-        </strong>
+          <button onclick="window.print()">
+            🖨️ Imprimir ticket
+          </button>
 
-        <br>
-
-
-        Fecha:
-        ${dateTime(sale.date)}
-
-        <br>
+        </div>
 
 
-        Cliente:
-        ${esc(sale.customerName)}
-
-
-        ${
-          sale.customerPhone
-
-            ? `
-                <br>
-
-                Teléfono:
-                ${esc(
-                  sale.customerPhone
-                )}
-              `
-
-            : ""
-        }
-
-
-        <br>
-
-
-        Estado:
-
-        ${
-          sale.status ===
-          "cancelled"
-
-            ? "ANULADA"
-
-            : "Confirmada"
-        }
-
-      </div>
-
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              Producto
-            </th>
-
-            <th>
-              Cant.
-            </th>
-
-            <th>
-              Precio
-            </th>
-
-            <th>
-              Subtotal
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-          ${rows}
-
-        </tbody>
-
-      </table>
-
-
-      <div class="ticket-total">
-
-        <span>
-          TOTAL
-        </span>
-
-        <span>
-          ${money(sale.total)}
-        </span>
-
-      </div>
-
-
-      <div class="thanks">
-
-        <strong>
-          ¡Gracias por tu compra!
-        </strong>
-
-      </div>
-
-
-      <div class="fiscal-notice">
-
-        Comprobante interno.
-        No válido como factura fiscal.
-
-      </div>
-
-
-      <div class="no-print">
-
-        <button
-          onclick="window.print()"
-        >
-          Imprimir ticket
-        </button>
-
-      </div>
-
+      </main>
 
     </body>
 
@@ -4093,8 +4111,6 @@ function printTicket(
   printWindow.focus();
 
 }
-
-
 // =====================================================
 // CLIENTES DISPONIBLES EN LA VENTA
 // =====================================================
